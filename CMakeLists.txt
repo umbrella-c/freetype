@@ -7,6 +7,13 @@ option (FREETYPE_BUILD_SHARED "Build the shared library version of libfreetype" 
 
 set (SRCS "")
 
+FetchContent_Declare(
+  png
+  GIT_REPOSITORY https://github.com/umbrella-c/libpng.git
+  GIT_TAG main
+)
+FetchContent_MakeAvailable(png)
+
 macro (add_sources)
     file (RELATIVE_PATH _relPath "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
     foreach (_src ${ARGN})
