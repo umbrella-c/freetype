@@ -5,14 +5,12 @@ project (freetype C)
 option (FREETYPE_BUILD_STATIC "Build the static version of libfreetype" OFF)
 option (FREETYPE_BUILD_SHARED "Build the shared library version of libfreetype" ON)
 
-set (SRCS "")
+find_package(ZLIB REQUIRED)
+find_package(PNG REQUIRED)
 
-FetchContent_Declare(
-  png
-  GIT_REPOSITORY https://github.com/umbrella-c/libpng.git
-  GIT_TAG main
-)
-FetchContent_MakeAvailable(png)
+set (FT_INCLUDES ${ZLIB_INCLUDE_DIRS} ${PNG_INCLUDE_DIRS})
+set (FT_LIBS ${ZLIB_LIBRARIES} ${PNG_LIBRARIES})
+set (SRCS "")
 
 macro (add_sources)
     file (RELATIVE_PATH _relPath "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -70,17 +68,17 @@ add_sources(
     src/winfonts/winfnt.c
 )
 
-include_directories(
-    ${zlib_SOURCE_DIR}/include
-    ${png_SOURCE_DIR}/include
-    ${CMAKE_BINARY_DIR} # for zconf.h
-    include
-)
-
 add_definitions (-DFT2_BUILD_LIBRARY)
 
 if (FREETYPE_BUILD_STATIC)
     add_library(freetype_static STATIC ${SHARED_SRCS})
+    target_include_directories(freetype_static PRIVATE ${FT_INCLUDES})
+    target_include_directories(freetype_static PUBLIC include)
+    
+    install(TARGETS freetype_static
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+    )
 endif ()
 
 if (FREETYPE_BUILD_SHARED)
@@ -90,7 +88,16 @@ if (FREETYPE_BUILD_SHARED)
     endif ()
 
     add_library(freetype SHARED ${SHARED_SRCS})
-    add_dependencies(freetype png)
+    target_include_directories(freetype PRIVATE ${FT_INCLUDES})
+    target_include_directories(freetype PUBLIC include)
     target_compile_definitions(freetype PUBLIC -DFT_SHARED_LIBRARY)
-    target_link_libraries(freetype png)
+    target_link_libraries(freetype ${FT_LIBS})
+
+    install(TARGETS freetype
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+    )
 endif ()
+
+install(DIRECTORY include/ DESTINATION include)

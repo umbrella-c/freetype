@@ -1,0 +1,51 @@
+# project information, packaging data
+project: 
+  name: FreeType is a freely available software library to render fonts.
+  description: |
+    It is written in C, designed to be small, efficient, highly customizable, and 
+    portable while capable of producing high-quality output (glyph images) of most 
+    vector and bitmap font formats.
+  type: ingredient
+  author: David Turner, Robert Wilhelm and Werner Lemberg
+  email: freetype@nongnu.org
+  version: 2.11
+  license: https://freetype.org/license.html
+  homepage: https://freetype.org/
+
+ingredients:
+- name: vali/clang-cc
+  description: Use the clang cross-compiler to build the OS
+  channel: devel
+- name: vali/sdk-c
+  description: We need the C SDK to build the library for Vali
+  channel: devel
+  platform: vali
+- name: vali/zlib
+  description: Include zlib for libfreetype
+  channel: devel
+  platform: vali
+- name: vali/libpng
+  description: Include libpng for libfreetype
+  channel: devel
+  platform: vali
+
+recipes:
+  - name: libfreetype
+    path: /
+    toolchain: vali/clang-cc
+    steps:
+    - type: generate
+      system: cmake
+      arguments:
+        - -G
+        - '"Unix Makefiles"'
+        - -DCMAKE_TOOLCHAIN_FILE=${{ PROJECT_PATH }}/chef/Vali.cmake
+        - -DZLIB_ROOT=${{ INGREDIENTS_PREFIX }}
+        - -DPNG_ROOT=${{ INGREDIENTS_PREFIX }}
+      env:
+        CROSS: ${{ TOOLCHAIN_PREFIX }}
+        VALI_SDK_PATH: ${{ INGREDIENTS_PREFIX }}/vali-sdk
+        VALI_DDK_PATH: ${{ INGREDIENTS_PREFIX }}/vali-ddk
+    - type: build
+      depends: [generate]
+      system: make
