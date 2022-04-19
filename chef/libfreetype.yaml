@@ -1,14 +1,12 @@
-# project information, packaging data
 project: 
-  name: FreeType is a freely available software library to render fonts.
+  summary: FreeType is a freely available software library to render fonts.
   description: |
     It is written in C, designed to be small, efficient, highly customizable, and 
     portable while capable of producing high-quality output (glyph images) of most 
     vector and bitmap font formats.
-  type: ingredient
   author: David Turner, Robert Wilhelm and Werner Lemberg
   email: freetype@nongnu.org
-  version: 2.11
+  version: 2.11.1
   license: https://freetype.org/license.html
   homepage: https://freetype.org/
 
@@ -49,3 +47,7 @@ recipes:
     - type: build
       depends: [generate]
       system: make
+
+packs:
+- name: libfreetype
+  type: ingredient
