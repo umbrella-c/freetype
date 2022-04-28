@@ -12,27 +12,23 @@ project:
 
 ingredients:
 - name: vali/clang-cc
-  description: Use the clang cross-compiler to build the OS
   channel: devel
+  platform: host
+  arch: host
 - name: vali/sdk-c
-  description: We need the C SDK to build the library for Vali
   channel: devel
-  platform: vali
 - name: vali/zlib
-  description: Include zlib for libfreetype
   channel: devel
-  platform: vali
 - name: vali/libpng
-  description: Include libpng for libfreetype
   channel: devel
-  platform: vali
 
 recipes:
   - name: libfreetype
     path: /
     toolchain: vali/clang-cc
     steps:
-    - type: generate
+    - name: config
+      type: generate
       system: cmake
       arguments:
         - -G
@@ -42,11 +38,16 @@ recipes:
         - -DPNG_ROOT=${{ INGREDIENTS_PREFIX }}
       env:
         CROSS: ${{ TOOLCHAIN_PREFIX }}
-        VALI_SDK_PATH: ${{ INGREDIENTS_PREFIX }}/vali-sdk
-        VALI_DDK_PATH: ${{ INGREDIENTS_PREFIX }}/vali-ddk
-    - type: build
-      depends: [generate]
+        VALI_ARCH: ${{ CHEF_ARCHITECTURE }}
+        VALI_SDK_PATH: ${{ INGREDIENTS_PREFIX }}
+    - name: build
+      type: build
+      depends: [config]
       system: make
+      env:
+        CROSS: ${{ TOOLCHAIN_PREFIX }}
+        VALI_ARCH: ${{ CHEF_ARCHITECTURE }}
+        VALI_SDK_PATH: ${{ INGREDIENTS_PREFIX }}
 
 packs:
 - name: libfreetype
