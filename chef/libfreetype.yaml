@@ -37,16 +37,14 @@ recipes:
         - -DZLIB_ROOT=${{ INGREDIENTS_PREFIX }}
         - -DPNG_ROOT=${{ INGREDIENTS_PREFIX }}
       env:
-        CROSS: ${{ TOOLCHAIN_PREFIX }}
-        VALI_ARCH: ${{ CHEF_ARCHITECTURE }}
+        CROSS: ${{ TOOLCHAIN_PREFIX }}/usr/local
+        VALI_ARCH: ${{ CHEF_TARGET_ARCHITECTURE }}
         VALI_SDK_PATH: ${{ INGREDIENTS_PREFIX }}
     - name: build
       type: build
       depends: [config]
       system: make
       env:
-        CROSS: ${{ TOOLCHAIN_PREFIX }}
-        VALI_ARCH: ${{ CHEF_ARCHITECTURE }}
         VALI_SDK_PATH: ${{ INGREDIENTS_PREFIX }}
 
 packs:
